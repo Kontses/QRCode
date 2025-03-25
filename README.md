@@ -14,7 +14,7 @@
 
 1. Κλωνοποιήστε το repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/QRCode.git
+git clone https://github.com/Kontses/QRCode.git
 cd QRCode
 ```
 
