@@ -1,27 +1,29 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 
 interface LanguageSwitcherProps {
   currentLang: string;
+  onLanguageChange: (lang: string) => void;
 }
 
-const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ currentLang }) => {
-  const router = useRouter();
-
+const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ currentLang, onLanguageChange }) => {
   const toggleLanguage = () => {
     const newLang = currentLang === 'en' ? 'gr' : 'en';
     localStorage.setItem('preferredLanguage', newLang);
-    router.push(`/${newLang}`);
+    onLanguageChange(newLang);
   };
 
   return (
     <button
       onClick={toggleLanguage}
-      className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+      className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 
+                transition-all duration-200 ease-in-out transform hover:scale-105
+                font-medium tracking-wide"
     >
-      {currentLang === 'en' ? 'ΕΛ' : 'EN'}
+      <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        {currentLang === 'en' ? 'ΕΛ' : 'EN'}
+      </span>
     </button>
   );
 };

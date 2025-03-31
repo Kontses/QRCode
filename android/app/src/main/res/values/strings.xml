@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DocQR</string>
+    <string name="title_activity_main">DocQR</string>
+    <string name="package_name">com.docqr.app</string>
+    <string name="custom_url_scheme">com.docqr.app</string>
+</resources>

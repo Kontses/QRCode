@@ -4,6 +4,11 @@ import withPWA from '@ducanh2912/next-pwa';
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'export',
+  distDir: 'out',
+  images: {
+    unoptimized: true
+  }
 }
 
 export default withPWA({

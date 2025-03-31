@@ -7,15 +7,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "static": "next build",
+    "cap:build": "npm run static && npx cap sync",
+    "cap:open": "npx cap open android",
+    "android:build": "npm run cap:build && cd android && .\\gradlew.bat assembleDebug"
   },
   "dependencies": {
+    "@capacitor/android": "5.5.1",
+    "@capacitor/camera": "5.0.7",
+    "@capacitor/cli": "5.5.1",
+    "@capacitor/core": "5.5.1",
+    "@ducanh2912/next-pwa": "^8.0.0",
+    "@heroicons/react": "^2.2.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "html5-qrcode": "^2.3.8",
+    "lodash": "^4.17.21",
     "next": "^14.1.0",
     "qrcode": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "lodash": "^4.17.21",
-    "@ducanh2912/next-pwa": "^8.0.0",
     "react-markdown": "^9.0.1"
   },
   "devDependencies": {
@@ -27,7 +38,6 @@
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.1.0",
     "gray-matter": "^4.0.3",
-    "html5-qrcode": "^2.3.8",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
