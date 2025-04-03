@@ -55,7 +55,7 @@ export default function Home() {
   const [showScanner, setShowScanner] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const t = useTranslations(currentLang);
+  const translations = useTranslations(currentLang);
   const { 
     documents, 
     loading: docsLoading, 
@@ -101,7 +101,7 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">{t.loading}</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">{translations.loading}</p>
         </div>
       </div>
     );
@@ -116,7 +116,7 @@ export default function Home() {
             onClick={() => window.location.reload()}
             className="btn-primary"
           >
-            {t.retry}
+            {translations.retry}
           </button>
         </div>
       </div>
@@ -147,7 +147,7 @@ export default function Home() {
                 <CollapsibleSearch
                   value={searchQuery}
                   onChange={handleSearch}
-                  placeholder={t.search}
+                  placeholder={translations.search}
                 />
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function Home() {
                 onClick={() => setShowScanner(!showScanner)}
                 className="btn-primary"
               >
-                {t.scanQR}
+                {translations.scanQR}
               </button>
               <select
                 value={currentLang}
@@ -171,7 +171,7 @@ export default function Home() {
                 onClick={handleLogout}
                 className="btn-primary"
               >
-                {t.logout}
+                {translations.logout}
               </button>
             </div>
           </div>
@@ -181,7 +181,7 @@ export default function Home() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {!isOnline && (
           <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-md">
-            {t.offlineMode}
+            {translations.offlineMode}
           </div>
         )}
 
@@ -195,16 +195,16 @@ export default function Home() {
           {docsLoading ? (
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400 mx-auto"></div>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">{t.loading}</p>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">{translations.loading}</p>
             </div>
           ) : docsError ? (
             <div className="text-red-500 text-center">
-              {t.fetchError}
+              {translations.fetchError}
             </div>
           ) : (
             <div className="mt-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                {searchQuery ? t.searchResults : t.availableDocs}
+                {searchQuery ? translations.searchResults : translations.availableDocs}
               </h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {documents.map((doc) => (
@@ -221,7 +221,7 @@ export default function Home() {
                 ))}
               </div>
               {documents.length === 0 && (
-                <p className="text-center text-gray-600 dark:text-gray-400 mt-8">{t.noResults}</p>
+                <p className="text-center text-gray-600 dark:text-gray-400 mt-8">{translations.noResults}</p>
               )}
             </div>
           )}
