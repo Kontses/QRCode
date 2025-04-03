@@ -19,13 +19,13 @@ interface UserRegistration {
 }
 
 export class UserService {
-  private apiUrl: string;
+  private static apiUrl: string = process.env.NEXT_PUBLIC_API_URL || '';
   private readonly EMAIL_DOMAIN = 'traxis.gr';
   private static readonly TOKEN_KEY = 'auth_token';
   private static readonly USER_KEY = 'user_data';
 
   constructor() {
-    this.apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    // Empty constructor
   }
 
   private validateEmail(email: string): boolean {
@@ -59,7 +59,7 @@ export class UserService {
       const name = this.extractNameFromEmail(userData.email);
       const password_hash = await this.hashPassword(userData.password);
       
-      const response = await fetch(`${this.apiUrl}/api/users/register`, {
+      const response = await fetch(`${UserService.apiUrl}/api/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export class UserService {
 
   static async login(email: string, password: string): Promise<void> {
     try {
-      const response = await fetch('/api/users/login', {
+      const response = await fetch(`${UserService.apiUrl}/api/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ export class UserService {
     }
 
     try {
-      const response = await fetch('/api/users/me', {
+      const response = await fetch(`${UserService.apiUrl}/api/users/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

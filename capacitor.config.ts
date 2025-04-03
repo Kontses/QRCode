@@ -5,8 +5,14 @@ const config: CapacitorConfig = {
   appName: 'QR Code',
   webDir: 'out',
   server: {
-    url: 'https://ep-falling-river-a2xs1r75-pooler.eu-central-1.aws.neon.tech',
-    cleartext: false
+    androidScheme: 'https',
+    hostname: 'qr-code-i6w0eny5l-kontses-projects.vercel.app',
+    allowNavigation: ['qr-code-i6w0eny5l-kontses-projects.vercel.app']
+  },
+  plugins: {
+    CapacitorHttp: {
+      enabled: true
+    }
   },
   android: {
     buildOptions: {

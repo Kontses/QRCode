@@ -9,13 +9,30 @@ if (!process.env.POSTGRES_URL) {
 const sql = neon(process.env.POSTGRES_URL);
 
 export async function GET(request: Request) {
+  // Handle CORS preflight requests
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
+  }
+
   try {
     // Παίρνουμε το token από το header
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: 'No token provided' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
       );
     }
 
@@ -34,7 +51,12 @@ export async function GET(request: Request) {
     if (result.length === 0) {
       return NextResponse.json(
         { error: 'User not found' },
-        { status: 404 }
+        { 
+          status: 404,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
       );
     }
 
@@ -44,18 +66,32 @@ export async function GET(request: Request) {
       id: user.id,
       name: user.name,
       email: user.email,
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   } catch (error) {
     console.error('Auth check error:', error);
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json(
         { error: 'Invalid token' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
       );
     }
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      }
     );
   }
 } 
