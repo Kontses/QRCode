@@ -2,18 +2,18 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.docqr.app',
-  appName: 'DocQR',
+  appName: 'QR Code',
   webDir: 'out',
   server: {
-    androidScheme: 'https',
-    cleartext: true,
-    hostname: 'localhost'
+    url: 'https://ep-falling-river-a2xs1r75-pooler.eu-central-1.aws.neon.tech',
+    cleartext: false
   },
   android: {
     buildOptions: {
-      keystorePath: 'docqr.keystore',
-      keystoreAlias: 'docqr',
-      keystorePassword: 'docqr123'
+      keystorePath: 'android.keystore',
+      keystorePassword: 'android',
+      keystoreAlias: 'androiddebugkey',
+      keystoreAliasPassword: 'android'
     }
   }
 };

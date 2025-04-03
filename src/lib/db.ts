@@ -1,29 +1,27 @@
-import { neon, neonConfig } from '@neondatabase/serverless';
+import { neon } from '@neondatabase/serverless';
 import { Pool } from 'pg';
 
-neonConfig.fetchConnectionCache = true;
-
-const connectionString = process.env.POSTGRES_URL;
-
-if (!connectionString) {
+if (!process.env.POSTGRES_URL) {
   throw new Error('POSTGRES_URL is not defined');
 }
 
-console.log('Database connection string:', connectionString);
+const sqlClient = neon(process.env.POSTGRES_URL);
+
+console.log('Database connection string:', process.env.POSTGRES_URL);
 
 // Για serverless περιβάλλον (API routes)
-export const sql = neon(connectionString);
+export const sqlServerless = sqlClient;
 
 // Για server-side λειτουργίες
 export const pool = new Pool({
-  connectionString,
+  connectionString: process.env.POSTGRES_URL,
 });
 
 // Helper function για queries
 export async function query(text: string, params?: any[]) {
   try {
     console.log('Executing query:', text, 'with params:', params);
-    const result = await sql(text, params);
+    const result = await sqlClient.query(text, params);
     console.log('Query result:', result);
     return result;
   } catch (error) {
@@ -36,43 +34,56 @@ export async function query(text: string, params?: any[]) {
 export interface Document {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   content: string;
+  html_content: string;
   slug: string;
   language: string;
-  created_at: Date;
-  updated_at: Date;
+  category?: string;
+  order?: number;
+  created_at: string;
+  updated_at: string;
+  version: number;
+  is_published: boolean;
 }
 
 // Queries για τα documents
 export const documentsQueries = {
-  // Ανάκτηση όλων των εγγράφων για συγκεκριμένη γλώσσα
-  getByLanguage: async (language: string): Promise<Document[]> => {
-    const result = await query(
-      'SELECT * FROM documents WHERE language = $1 ORDER BY created_at DESC',
+  getAll: async (language: string) => {
+    const result = await sqlClient.query(
+      `SELECT * FROM articles 
+       WHERE language = $1 
+       AND is_published = true 
+       ORDER BY "order" ASC, created_at DESC`,
       [language]
     );
-    return result as Document[];
+    return result;
   },
-
-  // Αναζήτηση εγγράφων
-  search: async (language: string, searchTerm: string): Promise<Document[]> => {
-    const result = await query(
-      `SELECT * FROM documents 
-       WHERE language = $1 
-       AND (title ILIKE $2 OR description ILIKE $2 OR content ILIKE $2)
-       ORDER BY created_at DESC`,
-      [language, `%${searchTerm}%`]
-    );
-    return result as Document[];
-  },
-
-  // Ανάκτηση εγγράφου με βάση το slug
-  getBySlug: async (slug: string, language: string): Promise<Document | null> => {
-    const result = await query(
-      'SELECT * FROM documents WHERE slug = $1 AND language = $2',
+  
+  getBySlug: async (slug: string, language: string) => {
+    const result = await sqlClient.query(
+      `SELECT * FROM articles 
+       WHERE slug = $1 
+       AND language = $2 
+       AND is_published = true`,
       [slug, language]
     );
-    return result.length > 0 ? (result[0] as Document) : null;
+    return result;
+  },
+  
+  search: async (query: string, language: string) => {
+    const result = await sqlClient.query(
+      `SELECT * FROM articles 
+       WHERE language = $1 
+       AND is_published = true 
+       AND (
+         title ILIKE $2 
+         OR description ILIKE $2 
+         OR content ILIKE $2
+       )
+       ORDER BY "order" ASC, created_at DESC`,
+      [language, `%${query}%`]
+    );
+    return result;
   }
 }; 

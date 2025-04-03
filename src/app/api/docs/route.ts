@@ -1,17 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { documentsQueries } from '@/lib/db';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const lang = searchParams.get('lang') || 'el';
     const search = searchParams.get('search');
 
     let documents;
     if (search) {
-      documents = await documentsQueries.search(lang, search);
+      documents = await documentsQueries.search(search, lang);
     } else {
-      documents = await documentsQueries.getByLanguage(lang);
+      documents = await documentsQueries.getAll(lang);
     }
 
     return NextResponse.json(documents);

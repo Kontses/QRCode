@@ -11,7 +11,8 @@
     "static": "next build",
     "cap:build": "npm run static && npx cap sync",
     "cap:open": "npx cap open android",
-    "android:build": "npm run cap:build && cd android && .\\gradlew.bat assembleDebug"
+    "android:build": "npm run cap:build && cd android && .\\gradlew.bat assembleDebug",
+    "import-docs": "node src/scripts/import-docs.mjs"
   },
   "dependencies": {
     "@capacitor-community/barcode-scanner": "^4.0.1",
@@ -35,9 +36,15 @@
     "next": "^14.1.0",
     "pg": "^8.14.1",
     "qrcode": "^1.5.3",
+    "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-markdown": "^9.0.1"
+    "react-markdown": "^9.0.1",
+    "rehype-highlight": "^7.0.2",
+    "rehype-stringify": "^10.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",
@@ -50,6 +57,7 @@
     "gray-matter": "^4.0.3",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
 }

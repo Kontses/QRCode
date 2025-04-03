@@ -1,31 +1,32 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { documentsQueries } from '@/lib/db';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    console.log('Documents API called');
-    const { searchParams } = new URL(request.url);
-    const language = searchParams.get('language') || 'el';
-    const searchTerm = searchParams.get('search');
-    
-    console.log('Language:', language);
-    console.log('Search term:', searchTerm);
+    const searchParams = request.nextUrl.searchParams;
+    const lang = searchParams.get('lang') || 'el';
+    const slug = searchParams.get('slug');
 
-    let documents;
-    if (searchTerm) {
-      console.log('Searching documents with term:', searchTerm);
-      documents = await documentsQueries.search(language, searchTerm);
-    } else {
-      console.log('Fetching all documents for language:', language);
-      documents = await documentsQueries.getByLanguage(language);
+    if (!slug) {
+      return NextResponse.json(
+        { error: 'Slug is required' },
+        { status: 400 }
+      );
     }
 
-    console.log('Documents found:', documents);
-    return NextResponse.json(documents);
+    const documents = await documentsQueries.getBySlug(slug, lang);
+    if (!documents || documents.length === 0) {
+      return NextResponse.json(
+        { error: 'Document not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(documents[0]);
   } catch (error) {
-    console.error('Documents API error:', error);
+    console.error('Error fetching document:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch documents' },
+      { error: 'Failed to fetch document' },
       { status: 500 }
     );
   }

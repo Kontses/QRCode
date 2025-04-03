@@ -199,7 +199,7 @@ export default function Home() {
             </div>
           ) : docsError ? (
             <div className="text-red-500 text-center">
-              {t('fetchError')}
+              {t.fetchError}
             </div>
           ) : (
             <div className="mt-8">
