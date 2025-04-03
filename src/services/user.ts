@@ -35,7 +35,10 @@ export class UserService {
   private static readonly USER_KEY = 'user_data';
 
   private static isCapacitorApp(): boolean {
-    return typeof window !== 'undefined' && window.Capacitor?.isNative === true;
+    const isCapacitor = typeof window !== 'undefined' && window.Capacitor?.isNative === true;
+    console.log('isCapacitorApp:', isCapacitor);
+    console.log('window.Capacitor:', window?.Capacitor);
+    return isCapacitor;
   }
 
   constructor() {
@@ -77,6 +80,9 @@ export class UserService {
         ? `${UserService.apiUrl}/api/users/register`
         : '/api/users/register';
 
+      console.log('Register URL:', url);
+      console.log('API URL:', UserService.apiUrl);
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -103,11 +109,20 @@ export class UserService {
 
   static async login(email: string, password: string): Promise<void> {
     try {
+      console.log('Starting login process...');
+      console.log('API URL:', UserService.apiUrl);
+      console.log('Environment:', {
+        window: typeof window !== 'undefined',
+        Capacitor: typeof window !== 'undefined' ? window.Capacitor : undefined,
+        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
+      });
+
       const url = UserService.isCapacitorApp()
         ? `${UserService.apiUrl}/api/users/login`
         : '/api/users/login';
 
-      console.log('Login URL:', url); // Debugging
+      console.log('Login URL:', url);
+      console.log('Request payload:', { email, password: '***' });
 
       const response = await fetch(url, {
         method: 'POST',
@@ -117,17 +132,26 @@ export class UserService {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
+        const errorData = await response.text();
+        console.log('Error response:', errorData);
         throw new Error('Invalid credentials');
       }
 
       const data = await response.json();
+      console.log('Login successful, storing tokens...');
+
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(UserService.TOKEN_KEY, data.token);
         window.localStorage.setItem(UserService.USER_KEY, JSON.stringify(data.user));
+        console.log('Tokens stored successfully');
       }
     } catch (error) {
       console.error('Login error:', error);
+      console.error('Error stack:', error.stack);
       throw error;
     }
   }
@@ -146,15 +170,20 @@ export class UserService {
 
     const token = window.localStorage.getItem(UserService.TOKEN_KEY);
     if (!token) {
+      console.log('No token found');
       return false;
     }
 
     try {
+      console.log('Checking auth...');
+      console.log('API URL:', UserService.apiUrl);
+
       const url = UserService.isCapacitorApp()
         ? `${UserService.apiUrl}/api/users/me`
         : '/api/users/me';
 
-      console.log('CheckAuth URL:', url); // Debugging
+      console.log('CheckAuth URL:', url);
+      console.log('Token:', token.substring(0, 10) + '...');
 
       const response = await fetch(url, {
         headers: {
@@ -162,9 +191,11 @@ export class UserService {
         },
       });
 
+      console.log('Auth check response:', response.status);
       return response.ok;
     } catch (error) {
       console.error('Auth check error:', error);
+      console.error('Error stack:', error.stack);
       return false;
     }
   }
