@@ -1,31 +1,19 @@
 'use client';
 
-import React from 'react';
+type Language = 'el' | 'en';
 
 interface LanguageSwitcherProps {
-  currentLang: string;
-  onLanguageChange: (lang: string) => void;
+  currentLang: Language;
+  onLanguageChange: (lang: Language) => void;
 }
 
-const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ currentLang, onLanguageChange }) => {
-  const toggleLanguage = () => {
-    const newLang = currentLang === 'en' ? 'gr' : 'en';
-    localStorage.setItem('preferredLanguage', newLang);
-    onLanguageChange(newLang);
-  };
-
+export default function LanguageSwitcher({ currentLang, onLanguageChange }: LanguageSwitcherProps) {
   return (
     <button
-      onClick={toggleLanguage}
-      className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 
-                transition-all duration-200 ease-in-out transform hover:scale-105
-                font-medium tracking-wide"
+      onClick={() => onLanguageChange(currentLang === 'el' ? 'en' : 'el')}
+      className="px-2 py-1 text-sm font-medium text-[var(--text-primary)] hover:text-[var(--text-secondary)] transition-colors duration-200"
     >
-      <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-        {currentLang === 'en' ? 'ΕΛ' : 'EN'}
-      </span>
+      {currentLang === 'el' ? 'EN' : 'ΕΛ'}
     </button>
   );
-};
-
-export default LanguageSwitcher; 
+} 

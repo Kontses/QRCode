@@ -1,0 +1,10 @@
+{
+  "appId": "gr.traxis.qrcode",
+  "appName": "QRCode",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "http",
+    "hostname": "localhost",
+    "url": "http://localhost:3000"
+  }
+} 

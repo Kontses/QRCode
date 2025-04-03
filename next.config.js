@@ -5,7 +5,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   output: 'export',
-  distDir: 'out',
   images: {
     unoptimized: true
   }

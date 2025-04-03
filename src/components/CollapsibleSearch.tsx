@@ -1,64 +1,54 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface CollapsibleSearchProps {
-  onSearch: (query: string) => void;
+  value: string;
+  onChange: (value: string) => void;
   placeholder: string;
 }
 
-const CollapsibleSearch: React.FC<CollapsibleSearchProps> = ({ onSearch, placeholder }) => {
+export default function CollapsibleSearch({
+  value,
+  onChange,
+  placeholder
+}: CollapsibleSearchProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchQuery);
-  };
 
   return (
     <div className="relative">
-      <form onSubmit={handleSubmit} className="flex items-center">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            onSearch(e.target.value);
-          }}
-          placeholder={placeholder}
-          className={`
-            bg-gray-700 text-white placeholder-gray-400
-            border border-gray-600 rounded-lg
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            transition-all duration-200 ease-in-out
-            ${isExpanded ? 'w-64 px-4 py-2' : 'w-40 px-3 py-1.5'}
-          `}
-          onFocus={() => setIsExpanded(true)}
-          onBlur={() => setIsExpanded(false)}
-        />
-        <button
-          type="submit"
-          className="ml-2 p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200 ease-in-out"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </button>
-      </form>
+      <div
+        className={`flex items-center transition-all duration-200 ${
+          isExpanded ? 'w-full' : 'w-10 sm:w-64'
+        }`}
+      >
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onFocus={() => setIsExpanded(true)}
+            onBlur={() => setIsExpanded(false)}
+            placeholder={placeholder}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+          />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg
+              className="h-5 w-5 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default CollapsibleSearch; 
+} 

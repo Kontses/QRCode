@@ -10,6 +10,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        primary: 'var(--primary)',
+        'primary-hover': 'var(--primary-hover)',
         gray: {
           900: 'var(--bg-primary)',
           800: 'var(--bg-secondary)',
