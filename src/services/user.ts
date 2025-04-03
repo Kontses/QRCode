@@ -156,14 +156,20 @@ export class UserService {
 
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
+      
+      // Log response headers
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Get response text first to see what we're getting
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
 
       if (!response.ok) {
-        const errorData = await response.text();
-        console.log('Error response:', errorData);
-        throw new Error('Invalid credentials');
+        throw new Error(`Login failed with status ${response.status}: ${responseText}`);
       }
 
-      const data = await response.json();
+      // Try to parse JSON only if response is ok
+      const data = JSON.parse(responseText);
       console.log('Login successful, storing tokens...');
 
       if (typeof window !== 'undefined') {
