@@ -152,7 +152,6 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <ThemeSwitcher />
               <button
                 onClick={() => setShowScanner(!showScanner)}
                 className="btn-primary"
@@ -167,6 +166,7 @@ export default function Home() {
                 <option value="el">Ελληνικά</option>
                 <option value="en">English</option>
               </select>
+              <ThemeSwitcher />
               <button
                 onClick={handleLogout}
                 className="btn-primary"
