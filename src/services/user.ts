@@ -18,6 +18,14 @@ interface UserRegistration {
   password: string;
 }
 
+declare global {
+  interface Window {
+    Capacitor?: {
+      isNative: boolean;
+    };
+  }
+}
+
 export class UserService {
   private static apiUrl: string = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
     ? 'http://localhost:3000'
@@ -25,6 +33,10 @@ export class UserService {
   private readonly EMAIL_DOMAIN = 'traxis.gr';
   private static readonly TOKEN_KEY = 'auth_token';
   private static readonly USER_KEY = 'user_data';
+
+  private static isCapacitorApp(): boolean {
+    return typeof window !== 'undefined' && window.Capacitor?.isNative === true;
+  }
 
   constructor() {
     // Empty constructor
@@ -61,7 +73,11 @@ export class UserService {
       const name = this.extractNameFromEmail(userData.email);
       const password_hash = await this.hashPassword(userData.password);
       
-      const response = await fetch(`${UserService.apiUrl}/api/users/register`, {
+      const url = UserService.isCapacitorApp()
+        ? `${UserService.apiUrl}/api/users/register`
+        : '/api/users/register';
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,9 +103,11 @@ export class UserService {
 
   static async login(email: string, password: string): Promise<void> {
     try {
-      const url = typeof window !== 'undefined' && !window.location.href.includes('capacitor://') 
-        ? '/api/users/login' 
-        : `${UserService.apiUrl}/api/users/login`;
+      const url = UserService.isCapacitorApp()
+        ? `${UserService.apiUrl}/api/users/login`
+        : '/api/users/login';
+
+      console.log('Login URL:', url); // Debugging
 
       const response = await fetch(url, {
         method: 'POST',
@@ -132,9 +150,11 @@ export class UserService {
     }
 
     try {
-      const url = !window.location.href.includes('capacitor://')
-        ? '/api/users/me'
-        : `${UserService.apiUrl}/api/users/me`;
+      const url = UserService.isCapacitorApp()
+        ? `${UserService.apiUrl}/api/users/me`
+        : '/api/users/me';
+
+      console.log('CheckAuth URL:', url); // Debugging
 
       const response = await fetch(url, {
         headers: {
