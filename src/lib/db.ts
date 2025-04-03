@@ -112,4 +112,12 @@ export const documentsQueries = {
       return [];
     }
   }
+};
+
+// Εξαγωγή του documentsQueries ως default export
+export default {
+  documentsQueries,
+  sqlClient,
+  pool,
+  query
 }; 
