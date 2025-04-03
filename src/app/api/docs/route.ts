@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentsQueries } from '@/lib/db';
+import db from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,13 +8,14 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     console.log('API route - GET /api/docs', { lang, search });
-    console.log('documentsQueries:', documentsQueries);
+    console.log('db object:', db);
+    console.log('documentsQueries:', db.documentsQueries);
 
     let documents;
     if (search) {
-      documents = await documentsQueries.search(search, lang);
+      documents = await db.documentsQueries.search(search, lang);
     } else {
-      documents = await documentsQueries.getAll(lang);
+      documents = await db.documentsQueries.getAll(lang);
     }
 
     console.log('Documents fetched:', documents);

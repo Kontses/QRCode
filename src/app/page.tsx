@@ -67,8 +67,8 @@ export default function Home() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const isAuth = await UserService.checkAuth();
-        setIsAuthenticated(isAuth);
+        const user = await UserService.getCurrentUser();
+        setIsAuthenticated(!!user);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Authentication error');
       } finally {
