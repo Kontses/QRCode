@@ -53,7 +53,7 @@ interface QueryResult<T> {
 }
 
 // Queries για τα documents
-export const documentsQueries = {
+const documentsQueries = {
   getAll: async (language: string) => {
     try {
       console.log('Getting all documents for language:', language);
@@ -115,9 +115,11 @@ export const documentsQueries = {
 };
 
 // Εξαγωγή του documentsQueries ως default export
-export default {
+const db = {
   documentsQueries,
   sqlClient,
   pool,
   query
-}; 
+};
+
+export default db; 

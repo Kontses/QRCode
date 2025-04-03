@@ -8,6 +8,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     console.log('API route - GET /api/docs', { lang, search });
+    console.log('db object:', db);
+    console.log('documentsQueries:', db.documentsQueries);
 
     let documents;
     if (search) {
