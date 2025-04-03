@@ -45,6 +45,7 @@ export class UserService {
     console.log('Getting API URL...');
     console.log('window.location.hostname:', typeof window !== 'undefined' ? window.location.hostname : 'undefined');
     console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+    console.log('isCapacitorApp:', UserService.isCapacitorApp());
     
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       console.log('Using localhost URL');
@@ -53,7 +54,8 @@ export class UserService {
     
     // For Capacitor app, use the API URL
     if (UserService.isCapacitorApp()) {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      // Remove any trailing slashes and ensure we have the full URL
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
       console.log('Using Capacitor API URL:', apiUrl);
       return apiUrl;
     }
@@ -136,11 +138,13 @@ export class UserService {
       console.log('Environment:', {
         window: typeof window !== 'undefined',
         Capacitor: typeof window !== 'undefined' ? window.Capacitor : undefined,
-        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
+        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+        isCapacitorApp: UserService.isCapacitorApp()
       });
 
+      const baseUrl = UserService.getApiUrl();
       const url = UserService.isCapacitorApp()
-        ? `${UserService.getApiUrl()}/api/users/login`
+        ? `${baseUrl}/api/users/login`
         : '/api/users/login';
 
       console.log('Login URL:', url);
@@ -150,17 +154,15 @@ export class UserService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({ email, password }),
       });
 
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
-      
-      // Log response headers
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
-      // Get response text first to see what we're getting
       const responseText = await response.text();
       console.log('Raw response:', responseText);
 
@@ -168,14 +170,19 @@ export class UserService {
         throw new Error(`Login failed with status ${response.status}: ${responseText}`);
       }
 
-      // Try to parse JSON only if response is ok
-      const data = JSON.parse(responseText);
-      console.log('Login successful, storing tokens...');
+      try {
+        const data = JSON.parse(responseText);
+        console.log('Login successful, storing tokens...');
 
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(UserService.TOKEN_KEY, data.token);
-        window.localStorage.setItem(UserService.USER_KEY, JSON.stringify(data.user));
-        console.log('Tokens stored successfully');
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(UserService.TOKEN_KEY, data.token);
+          window.localStorage.setItem(UserService.USER_KEY, JSON.stringify(data.user));
+          console.log('Tokens stored successfully');
+        }
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Response text that failed to parse:', responseText);
+        throw new Error('Failed to parse server response');
       }
     } catch (error) {
       console.error('Login error:', error);
