@@ -52,11 +52,10 @@ export class UserService {
       return 'http://localhost:3000';
     }
     
-    // For Capacitor app, use the API URL
+    // For Capacitor app, use hardcoded URL
     if (UserService.isCapacitorApp()) {
-      // Remove any trailing slashes and ensure we have the full URL
-      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
-      console.log('Using Capacitor API URL:', apiUrl);
+      const apiUrl = 'https://qr-code-i6w0eny5l-kontses-projects.vercel.app';
+      console.log('Using hardcoded API URL:', apiUrl);
       return apiUrl;
     }
     
@@ -134,15 +133,9 @@ export class UserService {
   static async login(email: string, password: string): Promise<void> {
     try {
       console.log('Starting login process...');
-      console.log('API URL:', UserService.getApiUrl());
-      console.log('Environment:', {
-        window: typeof window !== 'undefined',
-        Capacitor: typeof window !== 'undefined' ? window.Capacitor : undefined,
-        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-        isCapacitorApp: UserService.isCapacitorApp()
-      });
-
       const baseUrl = UserService.getApiUrl();
+      console.log('Base URL:', baseUrl);
+
       const url = UserService.isCapacitorApp()
         ? `${baseUrl}/api/users/login`
         : '/api/users/login';
@@ -150,33 +143,15 @@ export class UserService {
       console.log('Login URL:', url);
       console.log('Request payload:', { email, password: '***' });
 
-      const headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-      };
-
-      // First try OPTIONS request
-      if (UserService.isCapacitorApp()) {
-        console.log('Sending OPTIONS request...');
-        const optionsResponse = await fetch(url, {
-          method: 'OPTIONS',
-          headers
-        });
-        console.log('OPTIONS response status:', optionsResponse.status);
-        console.log('OPTIONS response headers:', Object.fromEntries(optionsResponse.headers.entries()));
-      }
-
-      // Then send the actual request
+      // Send the actual request
       console.log('Sending POST request...');
       const response = await fetch(url, {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ email, password }),
-        mode: 'cors',
-        credentials: 'include'
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
       });
 
       console.log('Response status:', response.status);
