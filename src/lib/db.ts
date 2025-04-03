@@ -47,43 +47,69 @@ export interface Document {
   is_published: boolean;
 }
 
+interface QueryResult<T> {
+  rows: T[];
+  [key: string]: any;
+}
+
 // Queries για τα documents
 export const documentsQueries = {
-  getAll: async (language: string) => {
-    const result = await sqlClient.query(
-      `SELECT * FROM articles 
-       WHERE language = $1 
-       AND is_published = true 
-       ORDER BY "order" ASC, created_at DESC`,
-      [language]
-    );
-    return result;
+  getAll: async (language: string): Promise<Document[]> => {
+    try {
+      console.log('Getting all documents for language:', language);
+      const result = await sqlClient.query<Document>(
+        `SELECT * FROM articles 
+         WHERE language = $1 
+         AND is_published = true 
+         ORDER BY "order" ASC, created_at DESC`,
+        [language]
+      ) as QueryResult<Document>;
+      console.log('Query result:', result);
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error in getAll:', error);
+      return [];
+    }
   },
   
-  getBySlug: async (slug: string, language: string) => {
-    const result = await sqlClient.query(
-      `SELECT * FROM articles 
-       WHERE slug = $1 
-       AND language = $2 
-       AND is_published = true`,
-      [slug, language]
-    );
-    return result;
+  getBySlug: async (slug: string, language: string): Promise<Document | null> => {
+    try {
+      console.log('Getting document by slug:', slug, 'language:', language);
+      const result = await sqlClient.query<Document>(
+        `SELECT * FROM articles 
+         WHERE slug = $1 
+         AND language = $2 
+         AND is_published = true`,
+        [slug, language]
+      ) as QueryResult<Document>;
+      console.log('Query result:', result);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error('Error in getBySlug:', error);
+      return null;
+    }
   },
   
-  search: async (query: string, language: string) => {
-    const result = await sqlClient.query(
-      `SELECT * FROM articles 
-       WHERE language = $1 
-       AND is_published = true 
-       AND (
-         title ILIKE $2 
-         OR description ILIKE $2 
-         OR content ILIKE $2
-       )
-       ORDER BY "order" ASC, created_at DESC`,
-      [language, `%${query}%`]
-    );
-    return result;
+  search: async (query: string, language: string): Promise<Document[]> => {
+    try {
+      console.log('Searching documents:', query, 'language:', language);
+      const result = await sqlClient.query<Document>(
+        `SELECT * FROM articles 
+         WHERE language = $1 
+         AND is_published = true 
+         AND (
+           title ILIKE $2 
+           OR description ILIKE $2 
+           OR content ILIKE $2
+         )
+         ORDER BY "order" ASC, created_at DESC`,
+        [language, `%${query}%`]
+      ) as QueryResult<Document>;
+      console.log('Query result:', result);
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error in search:', error);
+      return [];
+    }
   }
 }; 
