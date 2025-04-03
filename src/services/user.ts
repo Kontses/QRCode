@@ -41,6 +41,28 @@ export class UserService {
     return isCapacitor;
   }
 
+  private static getApiUrl(): string {
+    console.log('Getting API URL...');
+    console.log('window.location.hostname:', typeof window !== 'undefined' ? window.location.hostname : 'undefined');
+    console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+    
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      console.log('Using localhost URL');
+      return 'http://localhost:3000';
+    }
+    
+    // For Capacitor app, use the API URL
+    if (UserService.isCapacitorApp()) {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      console.log('Using Capacitor API URL:', apiUrl);
+      return apiUrl;
+    }
+    
+    // For browser, use relative URLs
+    console.log('Using relative URL');
+    return '';
+  }
+
   constructor() {
     // Empty constructor
   }
@@ -77,11 +99,11 @@ export class UserService {
       const password_hash = await this.hashPassword(userData.password);
       
       const url = UserService.isCapacitorApp()
-        ? `${UserService.apiUrl}/api/users/register`
+        ? `${UserService.getApiUrl()}/api/users/register`
         : '/api/users/register';
 
       console.log('Register URL:', url);
-      console.log('API URL:', UserService.apiUrl);
+      console.log('API URL:', UserService.getApiUrl());
 
       const response = await fetch(url, {
         method: 'POST',
@@ -110,7 +132,7 @@ export class UserService {
   static async login(email: string, password: string): Promise<void> {
     try {
       console.log('Starting login process...');
-      console.log('API URL:', UserService.apiUrl);
+      console.log('API URL:', UserService.getApiUrl());
       console.log('Environment:', {
         window: typeof window !== 'undefined',
         Capacitor: typeof window !== 'undefined' ? window.Capacitor : undefined,
@@ -118,7 +140,7 @@ export class UserService {
       });
 
       const url = UserService.isCapacitorApp()
-        ? `${UserService.apiUrl}/api/users/login`
+        ? `${UserService.getApiUrl()}/api/users/login`
         : '/api/users/login';
 
       console.log('Login URL:', url);
@@ -176,10 +198,10 @@ export class UserService {
 
     try {
       console.log('Checking auth...');
-      console.log('API URL:', UserService.apiUrl);
+      console.log('API URL:', UserService.getApiUrl());
 
       const url = UserService.isCapacitorApp()
-        ? `${UserService.apiUrl}/api/users/me`
+        ? `${UserService.getApiUrl()}/api/users/me`
         : '/api/users/me';
 
       console.log('CheckAuth URL:', url);
