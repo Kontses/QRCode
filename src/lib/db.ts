@@ -54,46 +54,46 @@ interface QueryResult<T> {
 
 // Queries για τα documents
 export const documentsQueries = {
-  getAll: async (language: string): Promise<Document[]> => {
+  getAll: async (language: string) => {
     try {
       console.log('Getting all documents for language:', language);
-      const result = await sqlClient.query<Document>(
+      const result = await sqlClient.query(
         `SELECT * FROM articles 
          WHERE language = $1 
          AND is_published = true 
          ORDER BY "order" ASC, created_at DESC`,
         [language]
-      ) as QueryResult<Document>;
+      );
       console.log('Query result:', result);
-      return result.rows || [];
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.error('Error in getAll:', error);
       return [];
     }
   },
   
-  getBySlug: async (slug: string, language: string): Promise<Document | null> => {
+  getBySlug: async (slug: string, language: string) => {
     try {
       console.log('Getting document by slug:', slug, 'language:', language);
-      const result = await sqlClient.query<Document>(
+      const result = await sqlClient.query(
         `SELECT * FROM articles 
          WHERE slug = $1 
          AND language = $2 
          AND is_published = true`,
         [slug, language]
-      ) as QueryResult<Document>;
+      );
       console.log('Query result:', result);
-      return result.rows[0] || null;
+      return Array.isArray(result) && result.length > 0 ? result[0] : null;
     } catch (error) {
       console.error('Error in getBySlug:', error);
       return null;
     }
   },
   
-  search: async (query: string, language: string): Promise<Document[]> => {
+  search: async (query: string, language: string) => {
     try {
       console.log('Searching documents:', query, 'language:', language);
-      const result = await sqlClient.query<Document>(
+      const result = await sqlClient.query(
         `SELECT * FROM articles 
          WHERE language = $1 
          AND is_published = true 
@@ -104,9 +104,9 @@ export const documentsQueries = {
          )
          ORDER BY "order" ASC, created_at DESC`,
         [language, `%${query}%`]
-      ) as QueryResult<Document>;
+      );
       console.log('Query result:', result);
-      return result.rows || [];
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.error('Error in search:', error);
       return [];
