@@ -36,15 +36,10 @@ export default function LoginForm({ onLoginSuccess, currentLang }: LoginFormProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (!isOnline) {
-      setError(t.noInternet);
-      return;
-    }
-
     setIsLoading(true);
     try {
-      await UserService.login(email, password);
+      const userService = new UserService();
+      await userService.login({ email, password });
       onLoginSuccess();
     } catch (err) {
       setError(t.loginError);
