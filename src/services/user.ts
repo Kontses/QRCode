@@ -150,13 +150,33 @@ export class UserService {
       console.log('Login URL:', url);
       console.log('Request payload:', { email, password: '***' });
 
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      };
+
+      // First try OPTIONS request
+      if (UserService.isCapacitorApp()) {
+        console.log('Sending OPTIONS request...');
+        const optionsResponse = await fetch(url, {
+          method: 'OPTIONS',
+          headers
+        });
+        console.log('OPTIONS response status:', optionsResponse.status);
+        console.log('OPTIONS response headers:', Object.fromEntries(optionsResponse.headers.entries()));
+      }
+
+      // Then send the actual request
+      console.log('Sending POST request...');
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers,
         body: JSON.stringify({ email, password }),
+        mode: 'cors',
+        credentials: 'include'
       });
 
       console.log('Response status:', response.status);
