@@ -53,7 +53,7 @@ interface QueryResult<T> {
 }
 
 // Queries για τα documents
-const documentsQueries = {
+export const documentsQueries = {
   getAll: async (language: string) => {
     try {
       console.log('Getting all documents for language:', language);

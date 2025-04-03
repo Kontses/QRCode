@@ -1,32 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentsQueries } from '@/lib/db';
+import db from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const lang = searchParams.get('lang') || 'el';
-    const slug = searchParams.get('slug');
+    const search = searchParams.get('search');
 
-    if (!slug) {
-      return NextResponse.json(
-        { error: 'Slug is required' },
-        { status: 400 }
-      );
+    console.log('API route - GET /api/documents', { lang, search });
+    console.log('db object:', db);
+    console.log('documentsQueries:', db.documentsQueries);
+
+    let documents;
+    if (search) {
+      documents = await db.documentsQueries.search(search, lang);
+    } else {
+      documents = await db.documentsQueries.getAll(lang);
     }
 
-    const documents = await documentsQueries.getBySlug(slug, lang);
-    if (!documents || documents.length === 0) {
-      return NextResponse.json(
-        { error: 'Document not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(documents[0]);
+    console.log('Documents fetched:', documents);
+    return NextResponse.json(documents);
   } catch (error) {
-    console.error('Error fetching document:', error);
+    console.error('Error fetching documents:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch document' },
+      { error: 'Failed to fetch documents' },
       { status: 500 }
     );
   }
