@@ -19,7 +19,9 @@ interface UserRegistration {
 }
 
 export class UserService {
-  private static apiUrl: string = process.env.NEXT_PUBLIC_API_URL || '';
+  private static apiUrl: string = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000'
+    : (process.env.NEXT_PUBLIC_API_URL || '');
   private readonly EMAIL_DOMAIN = 'traxis.gr';
   private static readonly TOKEN_KEY = 'auth_token';
   private static readonly USER_KEY = 'user_data';
@@ -85,7 +87,11 @@ export class UserService {
 
   static async login(email: string, password: string): Promise<void> {
     try {
-      const response = await fetch(`${UserService.apiUrl}/api/users/login`, {
+      const url = typeof window !== 'undefined' && !window.location.href.includes('capacitor://') 
+        ? '/api/users/login' 
+        : `${UserService.apiUrl}/api/users/login`;
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +132,11 @@ export class UserService {
     }
 
     try {
-      const response = await fetch(`${UserService.apiUrl}/api/users/me`, {
+      const url = !window.location.href.includes('capacitor://')
+        ? '/api/users/me'
+        : `${UserService.apiUrl}/api/users/me`;
+
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
