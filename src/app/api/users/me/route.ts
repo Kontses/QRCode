@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
-import { sql } from '@vercel/postgres';
+import { neon } from '@neondatabase/serverless';
 import jwt from 'jsonwebtoken';
+
+if (!process.env.POSTGRES_URL) {
+  throw new Error('POSTGRES_URL is not defined');
+}
+
+const sql = neon(process.env.POSTGRES_URL);
 
 export async function GET(request: Request) {
   try {
@@ -25,7 +31,7 @@ export async function GET(request: Request) {
       WHERE id = ${decoded.userId}
     `;
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
@@ -33,7 +39,7 @@ export async function GET(request: Request) {
     }
 
     // Επιστρέφουμε τα στοιχεία του χρήστη
-    const user = result.rows[0];
+    const user = result[0];
     return NextResponse.json({
       id: user.id,
       name: user.name,
