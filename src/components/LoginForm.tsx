@@ -38,8 +38,7 @@ export default function LoginForm({ onLoginSuccess, currentLang }: LoginFormProp
     setError('');
     setIsLoading(true);
     try {
-      const userService = new UserService();
-      await userService.login({ email, password });
+      await UserService.login(email, password);
       onLoginSuccess();
     } catch (err) {
       setError(t.loginError);

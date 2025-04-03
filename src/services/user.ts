@@ -133,55 +133,48 @@ export class UserService {
   static async login(email: string, password: string): Promise<void> {
     try {
       console.log('Starting login process...');
-      const baseUrl = UserService.getApiUrl();
-      console.log('Base URL:', baseUrl);
+      const apiUrl = UserService.getApiUrl();
+      console.log('API URL:', apiUrl);
+      console.log('Environment:', {
+        isCapacitor: UserService.isCapacitorApp(),
+        hostname: typeof window !== 'undefined' ? window.location.hostname : 'undefined',
+        apiUrl: process.env.NEXT_PUBLIC_API_URL
+      });
 
-      const url = UserService.isCapacitorApp()
-        ? `${baseUrl}/api/users/login`
+      const loginUrl = UserService.isCapacitorApp() 
+        ? `${apiUrl}/api/users/login`
         : '/api/users/login';
 
-      console.log('Login URL:', url);
+      console.log('Login URL:', loginUrl);
       console.log('Request payload:', { email, password: '***' });
 
-      // Send the actual request
-      console.log('Sending POST request...');
-      const response = await fetch(url, {
+      const response = await fetch(loginUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
-
       if (!response.ok) {
-        throw new Error(`Login failed with status ${response.status}: ${responseText}`);
+        const errorData = await response.json();
+        console.error('Login error response:', errorData);
+        throw new Error(errorData.error || 'Login failed');
       }
 
-      try {
-        const data = JSON.parse(responseText);
-        console.log('Login successful, storing tokens...');
+      const data = await response.json();
+      console.log('Login successful, user data:', {
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email
+      });
 
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(UserService.TOKEN_KEY, data.token);
-          window.localStorage.setItem(UserService.USER_KEY, JSON.stringify(data.user));
-          console.log('Tokens stored successfully');
-        }
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        console.error('Response text that failed to parse:', responseText);
-        throw new Error('Failed to parse server response');
-      }
+      UserService.setToken(data.token);
+      UserService.setUser(data.user);
     } catch (error) {
       console.error('Login error:', error);
-      console.error('Error stack:', error.stack);
       throw error;
     }
   }
@@ -236,5 +229,17 @@ export class UserService {
     }
     const userData = window.localStorage.getItem(UserService.USER_KEY);
     return userData ? JSON.parse(userData) : null;
+  }
+
+  private static setToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(UserService.TOKEN_KEY, token);
+    }
+  }
+
+  private static setUser(user: User): void {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(UserService.USER_KEY, JSON.stringify(user));
+    }
   }
 } 
