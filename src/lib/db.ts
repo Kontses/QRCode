@@ -99,8 +99,8 @@ export const documentsQueries = {
          AND is_published = true 
          AND (
            title ILIKE $2 
-           OR content ILIKE $2 
-           OR description ILIKE $2
+           OR description ILIKE $2 
+           OR content ILIKE $2
          )
          ORDER BY "order" ASC, created_at DESC`,
         [language, `%${query}%`]
@@ -114,10 +114,12 @@ export const documentsQueries = {
   }
 };
 
-// Default export
-export default {
+// Εξαγωγή του documentsQueries ως default export
+const db = {
+  documentsQueries,
   sqlClient,
   pool,
-  query,
-  documentsQueries
-}; 
+  query
+};
+
+export default db; 
