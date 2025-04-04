@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db from '@/lib/db';
+import { documentsQueries } from '@/lib/db';
 
 export async function OPTIONS() {
   return new NextResponse(null, {
-    status: 200,
+    status: 204,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
@@ -14,55 +14,33 @@ export async function OPTIONS() {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('API route - GET /api/docs');
-    const searchParams = request.nextUrl.searchParams;
+    const { searchParams } = new URL(request.url);
     const lang = searchParams.get('lang') || 'el';
     const search = searchParams.get('search');
-    
-    console.log('Parameters:', { lang, search });
-    console.log('db available:', !!db);
 
-    if (!db || !db.documentsQueries) {
-      console.error('db or documentsQueries is undefined');
-      return new NextResponse(
-        JSON.stringify({ error: 'Internal server error - database not available' }),
-        { 
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-          },
-        }
-      );
+    console.log('Parameters:', { lang, search });
+
+    if (!documentsQueries) {
+      console.error('documentsQueries is undefined');
+      return NextResponse.json({ error: 'Database connection error' }, { status: 500 });
     }
 
-    const documents = search 
-      ? await db.documentsQueries.search(search, lang)
-      : await db.documentsQueries.getAll(lang);
+    let documents;
+    if (search) {
+      documents = await documentsQueries.search(search, lang);
+    } else {
+      documents = await documentsQueries.getAll(lang);
+    }
 
-    console.log('Documents fetched:', documents);
-    
-    return new NextResponse(
-      JSON.stringify(documents),
-      { 
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
-    );
+    return NextResponse.json(documents, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
   } catch (error) {
-    console.error('Error fetching documents:', error);
-    return new NextResponse(
-      JSON.stringify({ error: 'Failed to fetch documents' }),
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
-    );
+    console.error('Error in /api/docs:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 } 
