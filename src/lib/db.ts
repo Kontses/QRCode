@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { Pool } from 'pg';
 
 if (!process.env.POSTGRES_URL) {
   throw new Error('POSTGRES_URL is not defined');
@@ -7,9 +8,6 @@ if (!process.env.POSTGRES_URL) {
 const sqlClient = neon(process.env.POSTGRES_URL);
 
 console.log('Database connection string:', process.env.POSTGRES_URL);
-
-// Για serverless περιβάλλον (API routes)
-export const sqlServerless = sqlClient;
 
 // Για server-side λειτουργίες
 export const pool = new Pool({
