@@ -54,7 +54,7 @@ export const documentsQueries = {
   getAll: async (language: string): Promise<Document[]> => {
     try {
       console.log('Getting all documents for language:', language);
-      const result = await sqlClient.query<Document>(
+      const result = await sqlClient.query(
         `SELECT * FROM articles 
          WHERE language = $1 
          AND is_published = true 
@@ -62,7 +62,7 @@ export const documentsQueries = {
         [language]
       );
       console.log('Query result:', result);
-      return result || [];
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.error('Error in getAll:', error);
       return [];
@@ -72,7 +72,7 @@ export const documentsQueries = {
   getBySlug: async (slug: string, language: string): Promise<Document | null> => {
     try {
       console.log('Getting document by slug:', slug, 'language:', language);
-      const result = await sqlClient.query<Document>(
+      const result = await sqlClient.query(
         `SELECT * FROM articles 
          WHERE slug = $1 
          AND language = $2 
@@ -80,7 +80,7 @@ export const documentsQueries = {
         [slug, language]
       );
       console.log('Query result:', result);
-      return result?.[0] || null;
+      return Array.isArray(result) && result.length > 0 ? result[0] : null;
     } catch (error) {
       console.error('Error in getBySlug:', error);
       return null;
@@ -90,7 +90,7 @@ export const documentsQueries = {
   search: async (query: string, language: string): Promise<Document[]> => {
     try {
       console.log('Searching documents:', query, 'language:', language);
-      const result = await sqlClient.query<Document>(
+      const result = await sqlClient.query(
         `SELECT * FROM articles 
          WHERE language = $1 
          AND is_published = true 
@@ -103,7 +103,7 @@ export const documentsQueries = {
         [language, `%${query}%`]
       );
       console.log('Query result:', result);
-      return result || [];
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.error('Error in search:', error);
       return [];

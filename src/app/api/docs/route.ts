@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentsQueries } from '@/lib/db';
+import db from '@/lib/db';
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -20,12 +20,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     
     console.log('Parameters:', { lang, search });
-    console.log('documentsQueries available:', !!documentsQueries);
+    console.log('db available:', !!db);
 
-    if (!documentsQueries) {
-      console.error('documentsQueries is undefined');
+    if (!db || !db.documentsQueries) {
+      console.error('db or documentsQueries is undefined');
       return new NextResponse(
-        JSON.stringify({ error: 'Internal server error - documentsQueries not found' }),
+        JSON.stringify({ error: 'Internal server error - database not available' }),
         { 
           status: 500,
           headers: {
@@ -37,8 +37,8 @@ export async function GET(request: NextRequest) {
     }
 
     const documents = search 
-      ? await documentsQueries.search(search, lang)
-      : await documentsQueries.getAll(lang);
+      ? await db.documentsQueries.search(search, lang)
+      : await db.documentsQueries.getAll(lang);
 
     console.log('Documents fetched:', documents);
     
