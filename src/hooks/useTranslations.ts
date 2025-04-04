@@ -21,6 +21,8 @@ interface Translations {
   offlineMode: string;
   fetchError: string;
   scanToView: string;
+  showScanner: string;
+  hideScanner: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -44,7 +46,9 @@ const translations: Record<Language, Translations> = {
     submit: 'Υποβολή',
     offlineMode: 'Είστε εκτός σύνδεσης. Χρησιμοποιούνται αποθηκευμένα δεδομένα.',
     fetchError: 'Αποτυχία λήψης εγγράφων',
-    scanToView: 'Σαρώστε για να δείτε στο κινητό'
+    scanToView: 'Σαρώστε για να δείτε στο κινητό',
+    showScanner: 'Εμφάνιση Scanner',
+    hideScanner: 'Απόκρυψη Scanner'
   },
   en: {
     search: 'Search...',
@@ -66,7 +70,9 @@ const translations: Record<Language, Translations> = {
     submit: 'Submit',
     offlineMode: 'You are offline. Using cached data.',
     fetchError: 'Failed to fetch documents',
-    scanToView: 'Scan to view on mobile'
+    scanToView: 'Scan to view on mobile',
+    showScanner: 'Show Scanner',
+    hideScanner: 'Hide Scanner'
   }
 };
 

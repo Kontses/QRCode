@@ -115,35 +115,60 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">QRCode App</h1>
-          <div className="flex items-center gap-4">
-            <ThemeSwitcher />
-            <button
-              onClick={() => setShowScanner(!showScanner)}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-            >
-              {showScanner ? 'Hide Scanner' : 'Show Scanner'}
-            </button>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90"
-            >
-              {translations.logout}
-            </button>
+        <nav className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-foreground">QRCode App</h1>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setCurrentLang('el')}
+                  className={`px-3 py-1 rounded-md ${
+                    currentLang === 'el'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  EL
+                </button>
+                <button
+                  onClick={() => setCurrentLang('en')}
+                  className={`px-3 py-1 rounded-md ${
+                    currentLang === 'en'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <CollapsibleSearch
+                value={searchQuery}
+                onChange={handleSearch}
+                placeholder={translations.search}
+              />
+              <ThemeSwitcher />
+              <button
+                onClick={() => setShowScanner(!showScanner)}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+              >
+                {showScanner ? translations.hideScanner : translations.showScanner}
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90"
+              >
+                {translations.logout}
+              </button>
+            </div>
           </div>
-        </div>
+        </nav>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <CollapsibleSearch
-          value={searchQuery}
-          onChange={handleSearch}
-          placeholder={translations.search}
-        />
-
         {showScanner && (
-          <div className="my-8">
+          <div className="mb-8">
             <QRScanner onClose={() => setShowScanner(false)} />
           </div>
         )}

@@ -61,21 +61,36 @@ export class UserService {
 
   static async login(email: string, password: string): Promise<void> {
     try {
-      const response = await fetch(`${UserService.getApiUrl()}/api/auth/login`, {
+      console.log('Login attempt for:', email);
+      const apiUrl = UserService.getApiUrl();
+      console.log('Using API URL:', apiUrl);
+
+      const url = `${apiUrl}/api/auth/login`;
+      console.log('Making request to:', url);
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers));
 
       const data = await response.json();
+      console.log('Response data:', { ...data, token: data.token ? '[REDACTED]' : undefined });
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      console.log('Login successful, storing data...');
       localStorage.setItem(UserService.TOKEN_KEY, data.token);
-      localStorage.setItem(UserService.USER_KEY, JSON.stringify(data.user));
+      localStorage.setItem(UserService.USER_KEY, JSON.stringify(data));
+      console.log('Data stored in localStorage');
     } catch (error) {
       console.error('Login error:', error);
       throw error;

@@ -45,7 +45,7 @@ export interface Document {
 }
 
 // Queries για τα documents
-export const documentsQueries = {
+const documentsQueries = {
   getAll: async (language: string): Promise<Document[]> => {
     try {
       console.log('Getting all documents for language:', language);
@@ -122,4 +122,12 @@ export const documentsQueries = {
       return [];
     }
   }
+} as const;
+
+export { documentsQueries };
+
+export default {
+  pool,
+  query,
+  documentsQueries
 }; 

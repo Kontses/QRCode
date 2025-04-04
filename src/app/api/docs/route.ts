@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentsQueries } from '@/lib/db';
+import db from '@/lib/db';
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -20,16 +20,16 @@ export async function GET(request: NextRequest) {
 
     console.log('Parameters:', { lang, search });
 
-    if (!documentsQueries) {
+    if (!db?.documentsQueries) {
       console.error('documentsQueries is undefined');
       return NextResponse.json({ error: 'Database connection error' }, { status: 500 });
     }
 
     let documents;
     if (search) {
-      documents = await documentsQueries.search(search, lang);
+      documents = await db.documentsQueries.search(search, lang);
     } else {
-      documents = await documentsQueries.getAll(lang);
+      documents = await db.documentsQueries.getAll(lang);
     }
 
     return NextResponse.json(documents, {
