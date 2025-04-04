@@ -50,7 +50,7 @@ interface QueryResult<T> {
 }
 
 // Queries για τα documents
-export const documentsQueries = {
+const documentsQueries = {
   getAll: async (language: string): Promise<Document[]> => {
     try {
       console.log('Getting all documents for language:', language);
@@ -62,7 +62,7 @@ export const documentsQueries = {
         [language]
       );
       console.log('Query result:', result);
-      return Array.isArray(result) ? result : [];
+      return result as Document[];
     } catch (error) {
       console.error('Error in getAll:', error);
       return [];
@@ -80,7 +80,7 @@ export const documentsQueries = {
         [slug, language]
       );
       console.log('Query result:', result);
-      return Array.isArray(result) && result.length > 0 ? result[0] : null;
+      return result?.[0] as Document || null;
     } catch (error) {
       console.error('Error in getBySlug:', error);
       return null;
@@ -103,20 +103,17 @@ export const documentsQueries = {
         [language, `%${query}%`]
       );
       console.log('Query result:', result);
-      return Array.isArray(result) ? result : [];
+      return result as Document[];
     } catch (error) {
       console.error('Error in search:', error);
       return [];
     }
   }
-} as const;
-
-// Εξαγωγή του documentsQueries ως default export
-const db = {
-  documentsQueries,
-  sqlClient,
-  pool,
-  query
 };
 
-export default db; 
+// Default export με όλα τα utilities
+export default {
+  pool,
+  sqlClient,
+  documentsQueries
+}; 
