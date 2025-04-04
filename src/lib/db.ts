@@ -10,12 +10,12 @@ const sqlClient = neon(process.env.POSTGRES_URL);
 console.log('Database connection string:', process.env.POSTGRES_URL);
 
 // Για server-side λειτουργίες
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: process.env.POSTGRES_URL,
 });
 
 // Helper function για queries
-async function query(text: string, params?: any[]) {
+export async function query(text: string, params?: any[]) {
   try {
     console.log('Executing query:', text, 'with params:', params);
     const result = await sqlClient.query(text, params);
@@ -45,7 +45,7 @@ export interface Document {
 }
 
 // Queries για τα documents
-const documentsQueries = {
+export const documentsQueries = {
   getAll: async (language: string): Promise<Document[]> => {
     try {
       console.log('Getting all documents for language:', language);

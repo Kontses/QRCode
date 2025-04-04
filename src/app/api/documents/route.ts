@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db from '@/lib/db';
+import { documentsQueries } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,12 +9,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     
     console.log('Parameters:', { lang, search });
-    console.log('db available:', !!db);
+    console.log('db available:', !!documentsQueries);
 
-    if (!db || !db.documentsQueries) {
-      console.error('db or documentsQueries is undefined');
+    if (!documentsQueries) {
+      console.error('documentsQueries is undefined');
       return new NextResponse(
-        JSON.stringify({ error: 'Internal server error - database not available' }),
+        JSON.stringify({ error: 'Database connection error' }),
         { 
           status: 500,
           headers: {
@@ -25,9 +25,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const documents = search 
-      ? await db.documentsQueries.search(search, lang)
-      : await db.documentsQueries.getAll(lang);
+    let documents;
+    if (search) {
+      documents = await documentsQueries.search(search, lang);
+    } else {
+      documents = await documentsQueries.getAll(lang);
+    }
 
     console.log('Documents fetched:', documents);
     
@@ -38,6 +41,8 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
       }
     );
@@ -54,4 +59,15 @@ export async function GET(request: NextRequest) {
       }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 } 
