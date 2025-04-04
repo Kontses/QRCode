@@ -122,12 +122,4 @@ export const documentsQueries = {
       return [];
     }
   }
-};
-
-const db = {
-  pool,
-  sqlClient,
-  documentsQueries
-};
-
-export default db; 
+}; 
