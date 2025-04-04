@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentsQueries } from '@/lib/db';
+import db from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,8 +8,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     const documents = search 
-      ? await documentsQueries.search(search, lang)
-      : await documentsQueries.getAll(lang);
+      ? await db.documentsQueries.search(search, lang)
+      : await db.documentsQueries.getAll(lang);
 
     return NextResponse.json(documents);
   } catch (error) {
