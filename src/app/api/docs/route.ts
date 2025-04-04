@@ -7,17 +7,10 @@ export async function GET(request: NextRequest) {
     const lang = searchParams.get('lang') || 'el';
     const search = searchParams.get('search');
 
-    console.log('API route - GET /api/docs', { lang, search });
-    console.log('documentsQueries:', documentsQueries);
+    const documents = search 
+      ? await documentsQueries.search(search, lang)
+      : await documentsQueries.getAll(lang);
 
-    let documents;
-    if (search) {
-      documents = await documentsQueries.search(search, lang);
-    } else {
-      documents = await documentsQueries.getAll(lang);
-    }
-
-    console.log('Documents fetched:', documents);
     return NextResponse.json(documents);
   } catch (error) {
     console.error('Error fetching documents:', error);

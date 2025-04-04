@@ -1,5 +1,4 @@
 import { neon } from '@neondatabase/serverless';
-import { Pool } from 'pg';
 
 if (!process.env.POSTGRES_URL) {
   throw new Error('POSTGRES_URL is not defined');
@@ -65,7 +64,7 @@ export const documentsQueries = {
         [language]
       );
       console.log('Query result:', result);
-      return Array.isArray(result) ? result : [];
+      return result || [];
     } catch (error) {
       console.error('Error in getAll:', error);
       return [];
@@ -83,7 +82,7 @@ export const documentsQueries = {
         [slug, language]
       );
       console.log('Query result:', result);
-      return Array.isArray(result) && result.length > 0 ? result[0] : null;
+      return result?.[0] || null;
     } catch (error) {
       console.error('Error in getBySlug:', error);
       return null;
@@ -106,7 +105,7 @@ export const documentsQueries = {
         [language, `%${query}%`]
       );
       console.log('Query result:', result);
-      return Array.isArray(result) ? result : [];
+      return result || [];
     } catch (error) {
       console.error('Error in search:', error);
       return [];
