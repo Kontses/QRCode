@@ -65,9 +65,9 @@ export default function Home() {
   } = useDocuments(currentLang);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = () => {
       try {
-        const isAuth = await UserService.checkAuth();
+        const isAuth = UserService.isAuthenticated();
         setIsAuthenticated(isAuth);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Authentication error');
@@ -84,8 +84,8 @@ export default function Home() {
     setError(null);
   };
 
-  const handleLogout = async () => {
-    await UserService.logout();
+  const handleLogout = () => {
+    UserService.logout();
     setIsAuthenticated(false);
   };
 
@@ -98,134 +98,93 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">{translations.loading}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-        <div className="text-center">
-          <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="btn-primary"
-          >
-            {translations.retry}
-          </button>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen">
-        <LoginForm 
-          onLoginSuccess={handleLoginSuccess} 
-          currentLang={currentLang}
-        />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoginForm onLoginSuccess={handleLoginSuccess} currentLang={currentLang} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      <nav className="nav-bar">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center flex-1">
-              <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">QRCode App</h1>
-              </div>
-              <div className="ml-6 flex-1 max-w-2xl">
-                <CollapsibleSearch
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  placeholder={translations.search}
-                />
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowScanner(!showScanner)}
-                className="btn-primary"
-              >
-                {translations.scanQR}
-              </button>
-              <select
-                value={currentLang}
-                onChange={(e) => setCurrentLang(e.target.value as Language)}
-                className="input-primary"
-              >
-                <option value="el">Ελληνικά</option>
-                <option value="en">English</option>
-              </select>
-              <ThemeSwitcher />
-              <button
-                onClick={handleLogout}
-                className="btn-primary"
-              >
-                {translations.logout}
-              </button>
-            </div>
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground">QRCode App</h1>
+          <div className="flex items-center gap-4">
+            <ThemeSwitcher />
+            <button
+              onClick={() => setShowScanner(!showScanner)}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              {showScanner ? 'Hide Scanner' : 'Show Scanner'}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90"
+            >
+              {translations.logout}
+            </button>
           </div>
         </div>
-      </nav>
+      </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {!isOnline && (
-          <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-md">
-            {translations.offlineMode}
-          </div>
-        )}
+      <main className="container mx-auto px-4 py-8">
+        <CollapsibleSearch
+          value={searchQuery}
+          onChange={handleSearch}
+          placeholder={translations.search}
+        />
 
         {showScanner && (
-          <div className="mb-8">
+          <div className="my-8">
             <QRScanner onClose={() => setShowScanner(false)} />
           </div>
         )}
 
-        <div className="px-4 py-6 sm:px-0">
-          {docsLoading ? (
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400 mx-auto"></div>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">{translations.loading}</p>
-            </div>
-          ) : docsError ? (
-            <div className="text-red-500 text-center">
-              {translations.fetchError}
-            </div>
-          ) : (
-            <div className="mt-8">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                {searchQuery ? translations.searchResults : translations.availableDocs}
-              </h2>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {documents.map((doc) => (
-                  <div key={doc.id} className="card">
-                    <div className="card-body">
-                      <h3 className="card-title">
-                        {doc.title}
-                      </h3>
-                      <p className="card-text">
-                        {doc.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+        {docsError && (
+          <div className="bg-destructive/10 text-destructive p-4 rounded-md mb-4">
+            {docsError}
+          </div>
+        )}
+
+        {!isOnline && (
+          <div className="bg-warning/10 text-warning p-4 rounded-md mb-4">
+            {translations.offlineMode}
+          </div>
+        )}
+
+        {docsLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="bg-card text-card-foreground rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              >
+                <h2 className="text-xl font-semibold mb-2">{doc.title}</h2>
+                {doc.description && (
+                  <p className="text-muted-foreground mb-4">{doc.description}</p>
+                )}
+                <a
+                  href={`/docs/${doc.slug}?lang=${currentLang}`}
+                  className="text-primary hover:text-primary/80"
+                >
+                  {currentLang === 'el' ? 'Διαβάστε περισσότερα' : 'Read more'}
+                </a>
               </div>
-              {documents.length === 0 && (
-                <p className="text-center text-gray-600 dark:text-gray-400 mt-8">{translations.noResults}</p>
-              )}
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
