@@ -10,12 +10,12 @@ const sqlClient = neon(process.env.POSTGRES_URL);
 console.log('Database connection string:', process.env.POSTGRES_URL);
 
 // Για server-side λειτουργίες
-export const pool = new Pool({
+const pool = new Pool({
   connectionString: process.env.POSTGRES_URL,
 });
 
 // Helper function για queries
-export async function query(text: string, params?: any[]) {
+async function query(text: string, params?: any[]) {
   try {
     console.log('Executing query:', text, 'with params:', params);
     const result = await sqlClient.query(text, params);
@@ -44,11 +44,6 @@ export interface Document {
   is_published: boolean;
 }
 
-interface QueryResult<T> {
-  rows: T[];
-  [key: string]: any;
-}
-
 // Queries για τα documents
 const documentsQueries = {
   getAll: async (language: string): Promise<Document[]> => {
@@ -61,7 +56,13 @@ const documentsQueries = {
          ORDER BY "order" ASC, created_at DESC`,
         [language]
       );
-      console.log('Query result:', result);
+      
+      if (!result || !Array.isArray(result)) {
+        console.log('No results or invalid result format');
+        return [];
+      }
+
+      console.log('getAll results:', result);
       return result as Document[];
     } catch (error) {
       console.error('Error in getAll:', error);
@@ -79,8 +80,14 @@ const documentsQueries = {
          AND is_published = true`,
         [slug, language]
       );
-      console.log('Query result:', result);
-      return result?.[0] as Document || null;
+      
+      if (!result || !Array.isArray(result) || result.length === 0) {
+        console.log('No document found');
+        return null;
+      }
+
+      console.log('getBySlug result:', result[0]);
+      return result[0] as Document;
     } catch (error) {
       console.error('Error in getBySlug:', error);
       return null;
@@ -102,7 +109,13 @@ const documentsQueries = {
          ORDER BY "order" ASC, created_at DESC`,
         [language, `%${query}%`]
       );
-      console.log('Query result:', result);
+      
+      if (!result || !Array.isArray(result)) {
+        console.log('No search results or invalid result format');
+        return [];
+      }
+
+      console.log('search results:', result);
       return result as Document[];
     } catch (error) {
       console.error('Error in search:', error);
@@ -111,9 +124,10 @@ const documentsQueries = {
   }
 };
 
-// Default export με όλα τα utilities
-export default {
+const db = {
   pool,
   sqlClient,
   documentsQueries
-}; 
+};
+
+export default db; 
