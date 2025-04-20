@@ -6,8 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    hostname: 'qr-code-i6w0eny5l-kontses-projects.vercel.app',
-    allowNavigation: ['qr-code-i6w0eny5l-kontses-projects.vercel.app']
+    hostname: 'qr-code-ij9un2o2j-kontses-projects.vercel.app',
+    allowNavigation: ['qr-code-ij9un2o2j-kontses-projects.vercel.app']
   },
   plugins: {
     CapacitorHttp: {

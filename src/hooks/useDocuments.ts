@@ -61,7 +61,7 @@ export function useDocuments(language: string) {
 
         if (needsSync) {
           // Φόρτωση από το API
-          const response = await fetch(`/api/docs?lang=${language}`);
+          const response = await fetch(`/api/documents?lang=${language}`);
           if (!response.ok) throw new Error('Failed to fetch documents');
           
           const data = await response.json();
@@ -119,7 +119,7 @@ export function useDocuments(language: string) {
         }
       } else {
         // Online αναζήτηση μέσω API
-        const response = await fetch(`/api/docs?lang=${language}&search=${searchTerm}`);
+        const response = await fetch(`/api/documents?lang=${language}&search=${searchTerm}`);
         if (!response.ok) throw new Error('Failed to search documents');
         
         const data = await response.json();

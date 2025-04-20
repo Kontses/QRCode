@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { documentsQueries } from '@/lib/db';
+import { documentsQueries } from '@/lib/documents-queries';
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,23 +7,8 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const lang = searchParams.get('lang') || 'el';
     const search = searchParams.get('search');
-    
-    console.log('Parameters:', { lang, search });
-    console.log('db available:', !!documentsQueries);
 
-    if (!documentsQueries) {
-      console.error('documentsQueries is undefined');
-      return new NextResponse(
-        JSON.stringify({ error: 'Database connection error' }),
-        { 
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-          },
-        }
-      );
-    }
+    console.log('Parameters:', { lang, search });
 
     let documents;
     if (search) {
@@ -33,10 +18,10 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('Documents fetched:', documents);
-    
+
     return new NextResponse(
       JSON.stringify(documents),
-      { 
+      {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +35,7 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching documents:', error);
     return new NextResponse(
       JSON.stringify({ error: 'Failed to fetch documents' }),
-      { 
+      {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
@@ -70,4 +55,4 @@ export async function OPTIONS() {
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
-} 
+}
